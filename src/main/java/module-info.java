@@ -23,7 +23,7 @@ open module cn.tealc.wutheringwavestool {
     requires com.sun.jna;
     requires filters;
     requires net.coobird.thumbnailator;
-    requires com.github.kwhat.jnativehook;
+    requires jnativehook;
     requires ch.qos.logback.core;
     requires ch.qos.logback.classic;
     requires cn.tealc.fxplugin;

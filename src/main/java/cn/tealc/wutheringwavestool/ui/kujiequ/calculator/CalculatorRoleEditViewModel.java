@@ -1,10 +1,14 @@
 package cn.tealc.wutheringwavestool.ui.kujiequ.calculator;
 
 import cn.tealc.wutheringwavestool.base.NotificationKey;
+import cn.tealc.wutheringwavestool.dao.PlanDao;
+import cn.tealc.wutheringwavestool.dao.PlanItemDao;
+import cn.tealc.wutheringwavestool.dao.PlanRoleDao;
 import cn.tealc.wutheringwavestool.dao.UserInfoDao;
 import cn.tealc.wutheringwavestool.model.ResponseBody;
 import cn.tealc.wutheringwavestool.model.message.MessageInfo;
 import cn.tealc.wutheringwavestool.model.message.MessageType;
+import cn.tealc.wutheringwavestool.model.plan.Plan;
 import com.kuro.kujiequ.model.calculator.exist.ExistedRoleDataForCalculator;
 import com.kuro.kujiequ.model.calculator.exist.RoleAim;
 import com.kuro.kujiequ.model.calculator.list.RoleForCalculator;
@@ -59,6 +63,10 @@ public class CalculatorRoleEditViewModel implements ViewModel {
     private final ObservableList<Cost> totalCostList = FXCollections.observableArrayList();
     private final ObservableList<Cost> missingCostList = FXCollections.observableArrayList();
     private final ObservableList<Cost> relateCostList = FXCollections.observableArrayList();
+    UserInfoDao userInfoDao = new UserInfoDao();
+    PlanDao planDao = new PlanDao();
+    PlanRoleDao planRoleDao = new PlanRoleDao();
+    PlanItemDao planItemDao = new PlanItemDao();
 
     private final RoleForCalculator role;
     public CalculatorRoleEditViewModel(RoleForCalculator role,Image icon) {
@@ -118,8 +126,8 @@ public class CalculatorRoleEditViewModel implements ViewModel {
      * @param otherSkills
      */
     public void calculate(List<String> otherSkills){
-        UserInfoDao dao = new UserInfoDao();
-        UserInfo userInfo = dao.getMain();
+
+        UserInfo userInfo = userInfoDao.getMain();
         if (userInfo != null) {
             RoleAim roleAim = new RoleAim();
             roleAim.setRoleId(role.getRoleId());
@@ -157,6 +165,23 @@ public class CalculatorRoleEditViewModel implements ViewModel {
         }
     }
 
+    public void add() {
+        List<Plan> plans = new ArrayList<>();
+        String roleId = String.valueOf(role.getRoleId());
+        for (Cost cost : missingCostList) {
+            Plan plan = new Plan();
+            plan.setRoleId(roleId);
+            plan.setItemId(cost.getId());
+            plan.setNum(cost.getNum());
+            planDao.addOrUpdatePlan(plan);
+            planRoleDao.addOrUpdatePlanRole(String.valueOf(role.getRoleId()), role.getRoleName(), role.getRoleIconUrl());
+            planItemDao.addOrUpdatePlanItem(cost);
+        }
+    }
+
+    public void del() {
+        planDao.deletePlan(role.getRoleId());
+    }
 
     private RoleAim.SkillLevelUp getSkillLevelUp(double start,double end){
         RoleAim.SkillLevelUp roleAimSkillLevelUp = new RoleAim.SkillLevelUp();

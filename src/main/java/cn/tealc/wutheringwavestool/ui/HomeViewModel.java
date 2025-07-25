@@ -3,13 +3,13 @@ package cn.tealc.wutheringwavestool.ui;
 import cn.tealc.wutheringwavestool.MainApplication;
 import cn.tealc.wutheringwavestool.base.Config;
 import cn.tealc.wutheringwavestool.base.NotificationKey;
-import cn.tealc.wutheringwavestool.dao.GameTimeDao;
-import cn.tealc.wutheringwavestool.dao.UserInfoDao;
+import cn.tealc.wutheringwavestool.dao.*;
 import cn.tealc.wutheringwavestool.jna.GameAppListener;
 import cn.tealc.wutheringwavestool.model.ResponseBody;
 import cn.tealc.wutheringwavestool.model.SourceType;
 import cn.tealc.wutheringwavestool.model.game.GameTime;
 import cn.tealc.wutheringwavestool.util.GameResourcesManager;
+import com.kuro.kujiequ.model.calculator.result.Cost;
 import com.kuro.kujiequ.model.roleData.user.BoxInfo;
 import com.kuro.kujiequ.model.roleData.user.RoleDailyData;
 import com.kuro.kujiequ.model.roleData.user.RoleInfo;
@@ -31,6 +31,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.image.Image;
 import javafx.util.Duration;
+import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +74,7 @@ public class HomeViewModel implements ViewModel {
     private SimpleStringProperty gameTimeText = new SimpleStringProperty();
     private SimpleStringProperty gameTimeTipText = new SimpleStringProperty();
     private SimpleObjectProperty<Image> headImg = new SimpleObjectProperty<>();
+    private final GameTimeDao gameTimeDao = new GameTimeDao();
     private SimpleBooleanProperty hasSign = new SimpleBooleanProperty(true);
     private SimpleStringProperty signText = new SimpleStringProperty();
     private SimpleStringProperty weeklyRougeText = new SimpleStringProperty();
@@ -80,6 +82,11 @@ public class HomeViewModel implements ViewModel {
     private SimpleStringProperty weeklyInstCountText = new SimpleStringProperty();
     private SimpleStringProperty weeklyInstCountTipText = new SimpleStringProperty("周本");
     private SimpleBooleanProperty startGameBtnDisabled = new SimpleBooleanProperty(false);
+    private final PlanDao planDao = new PlanDao();
+    private final PlanRoleDao planRoleDao = new PlanRoleDao();
+    private final PlanItemDao planItemDao = new PlanItemDao();
+    private SimpleObjectProperty<Image> planItem = new SimpleObjectProperty<>();
+    private int energy = 0;
 
     public HomeViewModel() {
         updateKujiequRoleData();
@@ -96,6 +103,36 @@ public class HomeViewModel implements ViewModel {
         });
     }
 
+    public void loadPlan() {
+        List<Pair<Integer, Pair<Cost, Integer>>> costTCNs = new ArrayList<>();
+        List<Cost> a = planDao.getItemByType(7);
+        if (energy >= 60) {
+            if (!Objects.equals(weeklyInstCountText.get(), "3/3")) {
+                if (!a.isEmpty()) {
+                    planItem.set(new Image(a.getFirst().getIconUrl()));
+                    return;
+                }
+            }
+        } else if (energy >= 40) {
+            a = planDao.getItemByType(4);
+            if (!a.isEmpty()) {
+                planItem.set(new Image(a.getFirst().getIconUrl()));
+                return;
+            }
+        } else {
+            a = planDao.getItemByType(8);
+            if (!a.isEmpty()) {
+                planItem.set(new Image(a.getFirst().getIconUrl()));
+                return;
+            } else {
+                a = planDao.getItemByType(3);
+                if (!a.isEmpty()) {
+                    planItem.set(new Image(a.getFirst().getIconUrl()));
+                    return;
+                }
+            }
+        }
+    }
 
     /**
      * @return void
@@ -117,7 +154,7 @@ public class HomeViewModel implements ViewModel {
      * @date: 2024/10/8
      */
     private List<GameTime> getGameTimes() {
-        GameTimeDao gameTimeDao = new GameTimeDao();
+
         LocalDate localDate = LocalDate.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String date = dateTimeFormatter.format(localDate);
@@ -147,9 +184,9 @@ public class HomeViewModel implements ViewModel {
 
     /**
      * @return void
-     * @description: 刷新库街区的角色数据
-     * @param:
-     * @date: 2024/10/8
+     * @description 刷新库街区的角色数据
+     * @param
+     * @date 2024/10/8
      */
     public void updateKujiequRoleData() {
         if (Config.setting.isNoKuJieQu()) {
@@ -170,6 +207,7 @@ public class HomeViewModel implements ViewModel {
             ResponseBody<String> responseBody = task.getValue();
             if (responseBody.getCode() == 200) {
                 getDailyData(userInfo);
+                loadPlan();
                 getRoleData(userInfo);
             } else {
                 MvvmFX.getNotificationCenter().publish(NotificationKey.MESSAGE,
@@ -273,7 +311,7 @@ public class HomeViewModel implements ViewModel {
                     energyText.set(String.format("%d/%d", data.getEnergyData().getCur(), data.getEnergyData().getTotal()));
                     weeklyInstCountText.set(String.format("%d/%d", data.getWeeklyData().getTotal() - data.getWeeklyData().getCur(), data.getWeeklyData().getTotal()));
                     storeEnergyText.set(String.format("%d/%d", data.getStoreEnergyData().getCur(), data.getStoreEnergyData().getTotal()));
-
+                    energy = data.getEnergyData().getCur() + data.getStoreEnergyData().getCur();
 
                 } else {
                     rolePaneVisible.set(false);
@@ -704,6 +742,18 @@ public class HomeViewModel implements ViewModel {
 
     public SimpleObjectProperty<Image> headImgProperty() {
         return headImg;
+    }
+
+    public Image getPlanItem() {
+        return planItem.get();
+    }
+
+    public void setPlanItem(Image headImg) {
+        this.planItem.set(headImg);
+    }
+
+    public SimpleObjectProperty<Image> planItemProperty() {
+        return planItem;
     }
 
     public boolean isRolePaneVisible() {

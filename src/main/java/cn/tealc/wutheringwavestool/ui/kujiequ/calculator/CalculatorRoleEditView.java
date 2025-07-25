@@ -224,6 +224,14 @@ public class CalculatorRoleEditView implements FxmlView<CalculatorRoleEditViewMo
         this.skillLowLabel03 = skillLowLabel03;
     }
 
+    public void add(ActionEvent actionEvent) {
+        viewModel.add();
+    }
+
+    public void del(ActionEvent actionEvent) {
+        viewModel.del();
+    }
+
 
     class Cell extends StackPane {
         private ImageView iv;

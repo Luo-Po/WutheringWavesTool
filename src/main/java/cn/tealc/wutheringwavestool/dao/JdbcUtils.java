@@ -129,6 +129,39 @@ public class JdbcUtils {
                         UNIQUE (role_id, end_time)
                     );
                     """;
+
+            String createPlan = """
+                    CREATE TABLE IF NOT EXISTS plan (
+                        role_id VARCHAR NOT NULL,
+                        item_id VARCHAR NOT NULL,
+                        num INTEGER NOT NULL,
+                        PRIMARY KEY (role_id, item_id),
+                        FOREIGN KEY (role_id) REFERENCES plan_role(id) ON DELETE CASCADE,
+                        FOREIGN KEY (item_id) REFERENCES plan_item(id) ON DELETE CASCADE
+                    );
+                    """;
+
+            String createPlanItem = """
+                    CREATE TABLE IF NOT EXISTS plan_item (
+                        id VARCHAR PRIMARY KEY,
+                        name TEXT NOT NULL UNIQUE,
+                        icon_url TEXT NOT NULL,
+                        type INTEGER NOT NULL,      -- 1:经验书 2:突破材料 3:技能书等
+                        quality INTEGER NOT NULL,   -- 1-5星品质
+                        preview BOOLEAN,
+                        -- 唯一约束确保物品不重复
+                        UNIQUE(name, type, quality)
+                    );
+                    """;
+
+            String createPlanRole = """
+                    CREATE TABLE IF NOT EXISTS plan_role (
+                        id VARCHAR PRIMARY KEY,
+                        name VARCHAR NOT NULL,
+                        icon_url VARCHAR
+                    );
+                    """;
+
             Statement st = con.createStatement();
             st.execute(createGameTime);
             st.execute(createGameRole);
@@ -137,6 +170,9 @@ public class JdbcUtils {
             st.execute(createGameTower);
             st.execute(createGameRecord);
             st.execute(createGameSlash);
+            st.execute(createPlan);
+            st.execute(createPlanItem);
+            st.execute(createPlanRole);
             st.close();
             con.close();
         } catch (SQLException e) {

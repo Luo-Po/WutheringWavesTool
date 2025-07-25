@@ -1,16 +1,11 @@
 package cn.tealc.wutheringwavestool.ui;
 
-import atlantafx.base.controls.Popover;
-import atlantafx.base.layout.InputGroup;
 import atlantafx.base.theme.Styles;
 import cn.tealc.wutheringwavestool.base.Config;
 import cn.tealc.wutheringwavestool.FXResourcesLoader;
-import cn.tealc.wutheringwavestool.MainApplication;
 import cn.tealc.wutheringwavestool.base.NotificationKey;
-import cn.tealc.wutheringwavestool.model.SourceType;
 import cn.tealc.wutheringwavestool.model.message.MessageInfo;
 import cn.tealc.wutheringwavestool.model.message.MessageType;
-import cn.tealc.wutheringwavestool.ui.component.StackPopup;
 import cn.tealc.wutheringwavestool.ui.item.HeaderImageSelectView;
 import cn.tealc.wutheringwavestool.ui.item.PlayTimeAlertItemView;
 import cn.tealc.wutheringwavestool.util.GameResourcesManager;
@@ -24,19 +19,15 @@ import javafx.animation.RotateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
-import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
-import javafx.stage.Popup;
 import javafx.util.Duration;
 
 import java.awt.*;
@@ -45,7 +36,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
@@ -55,6 +45,9 @@ import java.util.ResourceBundle;
  * @create: 2024-07-03 19:57
  */
 public class HomeView implements Initializable, FxmlView<HomeViewModel> {
+    public Label planRoleNameLabel;
+    public VBox planPane;
+    public ImageView planItem;
     @InjectViewModel
     private HomeViewModel viewModel;
 
@@ -162,13 +155,13 @@ public class HomeView implements Initializable, FxmlView<HomeViewModel> {
         gameTimeBtn.setTooltip(gameTimeTip);
         gameTimeBtn.textProperty().bind(viewModel.gameTimeTextProperty());
 
+        planItem.imageProperty().bind(viewModel.planItemProperty());
 
         Circle circle = new Circle(30, 30, 30);
         headIV.setClip(circle);
         changeHeaderIv();
 
         setChangeBgEnable();
-
 
         viewModel.checkIsWeekEnd();
 

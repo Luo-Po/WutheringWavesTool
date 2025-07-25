@@ -105,13 +105,21 @@
                      </children>
                   </GridPane>
                   <Label styleClass="text-subtle" text="角色等级低于技能要求等级时，即使技能等级拉高，也只会统计符合角色等级限制的技能材料。" wrapText="true" />
-                  <HBox alignment="CENTER" spacing="20.0">
-                     <children>
-                        <Button mnemonicParsing="false" onAction="#calculate" styleClass="accent" text="查询" />
-                        <Button mnemonicParsing="false" onAction="#reset" styleClass="danger" text="重置" />
-                        <Button mnemonicParsing="false" onAction="#back" text="返回" />
-                     </children>
-                  </HBox>
+                  <VBox alignment="CENTER" spacing="8.0">
+                     <HBox alignment="CENTER" spacing="20.0">
+                        <children>
+                           <Button mnemonicParsing="false" onAction="#calculate" styleClass="accent" text="查询"/>
+                           <Button mnemonicParsing="false" onAction="#reset" styleClass="danger" text="重置"/>
+                           <Button mnemonicParsing="false" onAction="#back" text="返回"/>
+                        </children>
+                     </HBox>
+                     <HBox alignment="CENTER" spacing="20.0">
+                        <children>
+                           <Button mnemonicParsing="false" onAction="#add" text="加入计划"/>
+                           <Button mnemonicParsing="false" onAction="#del" text="删除计划"/>
+                        </children>
+                     </HBox>
+                  </VBox>
                </children>
             </VBox>
             <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
